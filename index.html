@@ -4,125 +4,146 @@
     <meta charset="UTF-8">
     <meta name="referrer" content="no-referrer">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的公众号作品集</title>
+    <title>我的精致作品集</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+        /* 自定义平滑滚动和字体 */
+        html { scroll-behavior: smooth; }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
+        .card-hover:hover {
+            transform: translateY(-8px);
+        }
+        /* 隐藏滚动条但保留功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
+<body class="bg-[#f8fafc] text-slate-800 min-h-screen selection:bg-green-100">
 
-    <header class="py-12 text-center bg-white shadow-sm">
-        <h1 class="text-4xl font-extrabold text-green-600 tracking-tight">公众号作品收藏</h1>
-        <p class="text-gray-500 mt-3 text-lg">点击下方按钮，粘贴文章链接和封面图</p>
-        <button onclick="toggleForm()" class="mt-6 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-8 rounded-full transition-all shadow-lg active:scale-95">
-            + 添加新内容
-        </button>
+    <nav class="sticky top-0 z-50 glass-effect border-b border-white/20 px-6 py-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-black bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">MY PORTFOLIO</h1>
+            <button onclick="toggleForm()" class="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-bold hover:shadow-lg hover:shadow-slate-200 transition-all active:scale-95">
+                + 新增作品
+            </button>
+        </div>
+    </nav>
+
+    <header class="max-w-6xl mx-auto px-6 py-16 md:py-24 text-center">
+        <h2 class="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight">在这里，收藏每一份<span class="text-green-500 underline decoration-green-200 underline-offset-8">热爱</span>。</h2>
+        <p class="text-slate-500 text-lg max-w-2xl mx-auto">记录思考，沉淀价值。这是一个专属于你的公众号内容聚合空间。</p>
+        
+        <div class="mt-10 max-w-md mx-auto relative group">
+            <input type="text" id="searchInput" oninput="searchArticles()" placeholder="搜索标题或简介..." 
+                class="w-full px-6 py-4 rounded-2xl border-none bg-white shadow-xl shadow-slate-200/50 outline-none focus:ring-2 focus:ring-green-400 transition-all">
+            <div class="absolute right-4 top-4 text-slate-300 group-focus-within:text-green-500 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+        </div>
     </header>
 
-    <div id="tweetForm" class="hidden max-w-2xl mx-auto mt-8 p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
-        <h3 class="text-xl font-bold mb-6 text-gray-800">新增文章</h3>
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">文章标题</label>
-                <input type="text" id="tweetTitle" placeholder="请输入文章标题" class="w-full border border-gray-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-green-500 transition">
+    <section class="max-w-6xl mx-auto px-6 mb-12">
+        <div id="tagBar" class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+            <button onclick="filterByTag('全部')" class="tag-btn whitespace-nowrap px-6 py-2 rounded-full bg-slate-900 text-white font-medium shadow-sm transition-all">全部</button>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">封面图链接</label>
-                <input type="text" id="tweetImg" placeholder="右键文章封面复制图像地址并粘贴" class="w-full border border-gray-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-green-500 transition">
+    </section>
+
+    <div id="tweetForm" class="hidden fixed inset-0 z-[100] flex items-center justify-center px-4 bg-slate-900/20 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-8 transform transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">新增收藏</h3>
+                <button onclick="toggleForm()" class="text-slate-400 hover:text-slate-600">✕</button>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">文章链接 (URL)</label>
-                <input type="url" id="tweetUrl" placeholder="https://mp.weixin.qq.com/..." class="w-full border border-gray-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-green-500 transition">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">简短描述</label>
-                <textarea id="tweetDesc" rows="2" placeholder="一句话介绍这篇文章..." class="w-full border border-gray-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-green-500 transition"></textarea>
-            </div>
-            <div class="flex justify-end space-x-4 pt-2">
-                <button onclick="toggleForm()" class="px-6 py-2 text-gray-400 hover:text-gray-600 font-medium">取消</button>
-                <button onclick="saveTweet()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-2 rounded-xl font-bold transition shadow-md">保存到库</button>
+            <div class="space-y-4">
+                <input type="text" id="tweetTitle" placeholder="文章标题" class="w-full bg-slate-50 p-4 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-green-400 border-none transition-all">
+                <input type="text" id="tweetTag" placeholder="分类标签 (如：生活、技术)" class="w-full bg-slate-50 p-4 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-green-400 border-none transition-all">
+                <input type="text" id="tweetImg" placeholder="封面图片链接" class="w-full bg-slate-50 p-4 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-green-400 border-none transition-all">
+                <input type="url" id="tweetUrl" placeholder="文章访问链接" class="w-full bg-slate-50 p-4 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-green-400 border-none transition-all">
+                <textarea id="tweetDesc" rows="2" placeholder="文章简介..." class="w-full bg-slate-50 p-4 rounded-xl outline-none focus:bg-white focus:ring-2 focus:ring-green-400 border-none transition-all"></textarea>
+                <button onclick="saveTweet()" class="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-xl font-black text-lg shadow-lg shadow-green-200 transition-all active:scale-[0.98] mt-4">确认发布</button>
             </div>
         </div>
     </div>
 
-    <main class="max-w-6xl mx-auto p-8">
-        <div id="cardContainer" class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+    <main class="max-w-6xl mx-auto px-6 pb-24">
+        <div id="cardContainer" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             </div>
     </main>
 
-    <footer class="text-center py-12 text-gray-400 text-sm">
-        © 2026 我的作品集 | 已开启防盗链破解模式
-    </footer>
-
     <script>
-        // 读取数据
-        let tweets = JSON.parse(localStorage.getItem('wx_v3_data')) || [];
+        let articles = JSON.parse(localStorage.getItem('wx_pro_v1')) || [];
+        let currentFilter = '全部';
 
         function toggleForm() {
-            const form = document.getElementById('tweetForm');
-            form.classList.toggle('hidden');
+            document.getElementById('tweetForm').classList.toggle('hidden');
         }
 
-        // 保存逻辑
         function saveTweet() {
             const title = document.getElementById('tweetTitle').value;
-            const img = document.getElementById('tweetImg').value || 'https://via.placeholder.com/400x200?text=No+Image';
+            const tag = document.getElementById('tweetTag').value || '未分类';
+            const img = document.getElementById('tweetImg').value;
             const url = document.getElementById('tweetUrl').value;
             const desc = document.getElementById('tweetDesc').value;
 
-            if(!title || !url) {
-                alert("标题和链接是必填的哦！");
-                return;
-            }
+            if(!title || !url) return alert("标题和链接必填！");
 
-            const newData = { title, img, url, desc, id: Date.now() };
-            tweets.unshift(newData);
-            localStorage.setItem('wx_v3_data', JSON.stringify(tweets));
+            articles.unshift({ title, tag, img, url, desc, id: Date.now() });
+            localStorage.setItem('wx_pro_v1', JSON.stringify(articles));
             
             render();
             toggleForm();
-            // 重置表单
             document.querySelectorAll('#tweetForm input, #tweetForm textarea').forEach(el => el.value = '');
         }
 
-        // 删除逻辑
         function deleteTweet(id) {
-            if(confirm('确定要删除这篇文章吗？')) {
-                tweets = tweets.filter(t => t.id !== id);
-                localStorage.setItem('wx_v3_data', JSON.stringify(tweets));
+            if(confirm('确认删除这篇文章？')) {
+                articles = articles.filter(a => a.id !== id);
+                localStorage.setItem('wx_pro_v1', JSON.stringify(articles));
                 render();
             }
         }
 
-        // 渲染逻辑
-        function render() {
+        function render(data = articles) {
             const container = document.getElementById('cardContainer');
-            if (tweets.length === 0) {
-                container.innerHTML = '<div class="col-span-full text-center py-20 text-gray-400">目前还没有内容，快去添加吧！</div>';
+            const tagBar = document.getElementById('tagBar');
+            
+            // 渲染标签栏
+            const tags = ['全部', ...new Set(articles.map(a => a.tag))];
+            tagBar.innerHTML = tags.map(t => `
+                <button onclick="filterByTag('${t}')" class="whitespace-nowrap px-6 py-2 rounded-full transition-all font-medium ${currentFilter === t ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-500 hover:bg-slate-100'}">
+                    ${t}
+                </button>
+            `).join('');
+
+            // 过滤逻辑
+            const filtered = currentFilter === '全部' ? data : data.filter(a => a.tag === currentFilter);
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center py-20 text-slate-400">🔍 没发现相关内容...</div>';
                 return;
             }
 
-            container.innerHTML = tweets.map(t => `
-                <div class="bg-white rounded-3xl shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden flex flex-col group">
-                    <div class="h-52 overflow-hidden relative">
-                        <img src="${t.img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity"></div>
+            container.innerHTML = filtered.map(a => `
+                <div class="card-hover bg-white rounded-[2rem] p-4 transition-all duration-500 border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 flex flex-col group">
+                    <div class="h-56 rounded-[1.5rem] overflow-hidden mb-5 relative">
+                        <img src="${a.img || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=500'}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <div class="absolute top-4 left-4">
+                            <span class="px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-xs font-bold text-slate-800 shadow-sm">${a.tag}</span>
+                        </div>
                     </div>
-                    <div class="p-6 flex-grow">
-                        <h2 class="text-xl font-bold text-gray-800 mb-3 leading-snug line-clamp-2 group-hover:text-green-600 transition-colors">${t.title}</h2>
-                        <p class="text-gray-500 text-sm line-clamp-2">${t.desc || '点击下方按钮阅读完整内容'}</p>
+                    <div class="px-2 flex-grow">
+                        <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-green-600 transition-colors line-clamp-2">${a.title}</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed line-clamp-2">${a.desc || '这篇文章非常精彩，点击阅读全文了解更多。'}</p>
                     </div>
-                    <div class="px-6 py-5 bg-gray-50/50 border-t border-gray-50 flex justify-between items-center">
-                        <a href="${t.url}" target="_blank" class="bg-green-100 text-green-700 px-4 py-1.5 rounded-full font-bold text-sm hover:bg-green-600 hover:text-white transition-colors">
-                            阅读原文
+                    <div class="px-2 pt-6 pb-2 flex justify-between items-center">
+                        <a href="${a.url}" target="_blank" class="flex items-center gap-2 text-slate-900 font-black text-sm group-hover:gap-4 transition-all">
+                            VIEW ARTICLE <span class="text-green-500">→</span>
                         </a>
-                        <button onclick="deleteTweet(${t.id})" class="text-gray-300 hover:text-red-500 transition-colors p-1">
+                        <button onclick="deleteTweet(${a.id})" class="text-slate-200 hover:text-red-400 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                     </div>
@@ -130,7 +151,20 @@
             `).join('');
         }
 
-        // 初始化渲染
+        function filterByTag(tag) {
+            currentFilter = tag;
+            render();
+        }
+
+        function searchArticles() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = articles.filter(a => 
+                a.title.toLowerCase().includes(query) || 
+                a.desc.toLowerCase().includes(query)
+            );
+            render(filtered);
+        }
+
         render();
     </script>
 </body>
