@@ -3,130 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的推文收藏夹</title>
+    <title>我的公众号作品集</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* 防止页面加载闪烁 */
-        [v-cloak] { display: none; }
-    </style>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
 
     <header class="py-12 text-center bg-white shadow-sm">
-        <h1 class="text-4xl font-extrabold text-gray-800 tracking-tight">推文收藏夹</h1>
-        <p class="text-gray-500 mt-3 text-lg">记录每一份精彩的创作</p>
-        <button onclick="toggleForm()" class="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full transition-all shadow-lg">
-            + 添加新作品
+        <h1 class="text-4xl font-extrabold text-green-600">公众号收藏夹</h1>
+        <p class="text-gray-500 mt-3">点击下方按钮添加你的公众号文章</p>
+        <button onclick="toggleForm()" class="mt-6 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full transition shadow-lg">
+            + 添加新文章
         </button>
     </header>
 
-    <div id="tweetForm" class="hidden max-w-2xl mx-auto mt-8 p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
-        <h3 class="text-xl font-bold mb-4">新增推文链接</h3>
+    <div id="tweetForm" class="hidden max-w-2xl mx-auto mt-8 p-8 bg-white rounded-2xl shadow-xl border">
         <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700">作品标题</label>
-                <input type="text" id="tweetTitle" placeholder="给你的推文起个名字" class="w-full mt-1 border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">分类标签</label>
-                    <input type="text" id="tweetTag" placeholder="如：日常、技术" class="w-full mt-1 border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">推文链接 (URL)</label>
-                    <input type="url" id="tweetUrl" placeholder="https://x.com/..." class="w-full mt-1 border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">简短介绍</label>
-                <textarea id="tweetDesc" rows="3" placeholder="简单描述一下内容吧..." class="w-full mt-1 border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
-            </div>
-            <div class="flex justify-end space-x-3 mt-2">
-                <button onclick="toggleForm()" class="px-4 py-2 text-gray-500 hover:text-gray-700">取消</button>
-                <button onclick="saveTweet()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold transition">确认保存</button>
+            <input type="text" id="tweetTitle" placeholder="文章标题" class="w-full border p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-green-500">
+            <input type="text" id="tweetImg" placeholder="封面图片链接 (右键复制公众号图片地址)" class="w-full border p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-green-500">
+            <input type="url" id="tweetUrl" placeholder="文章访问链接 (https://mp.weixin.qq.com/...)" class="w-full border p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-green-500">
+            <textarea id="tweetDesc" rows="2" placeholder="文章简介..." class="w-full border p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-green-500"></textarea>
+            <div class="flex justify-end space-x-3">
+                <button onclick="toggleForm()" class="px-4 py-2 text-gray-400">取消</button>
+                <button onclick="saveTweet()" class="bg-green-600 text-white px-6 py-2 rounded-lg font-bold">保存文章</button>
             </div>
         </div>
     </div>
 
     <main class="max-w-6xl mx-auto p-8">
-        <div id="cardContainer" class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            </div>
+        <div id="cardContainer" class="grid gap-8 md:grid-cols-2 lg:grid-cols-3"></div>
     </main>
 
-    <footer class="text-center py-12 text-gray-400 text-sm">
-        © 2026 基于 LocalStorage 存储 | 部署于 GitHub Pages
-    </footer>
-
     <script>
-        // 初始化数据
-        let tweets = JSON.parse(localStorage.getItem('saved_tweets')) || [];
+        let tweets = JSON.parse(localStorage.getItem('wx_articles')) || [];
 
-        // 控制表单显示/隐藏
         function toggleForm() {
-            const form = document.getElementById('tweetForm');
-            form.classList.toggle('hidden');
+            document.getElementById('tweetForm').classList.toggle('hidden');
         }
 
-        // 保存推文逻辑
         function saveTweet() {
             const title = document.getElementById('tweetTitle').value;
-            const tag = document.getElementById('tweetTag').value || '未分类';
-            const desc = document.getElementById('tweetDesc').value;
+            const img = document.getElementById('tweetImg').value || 'https://via.placeholder.com/400x200?text=No+Image';
             const url = document.getElementById('tweetUrl').value;
+            const desc = document.getElementById('tweetDesc').value;
 
-            if(!title || !url) {
-                alert("标题和链接是必填项哦！");
-                return;
-            }
+            if(!title || !url) return alert("标题和链接必填！");
 
-            const newTweet = { title, tag, desc, url, id: Date.now() };
-            tweets.unshift(newTweet); // 新添加的排在前面
-            localStorage.setItem('saved_tweets', JSON.stringify(tweets));
-            
+            tweets.unshift({ title, img, url, desc, id: Date.now() });
+            localStorage.setItem('wx_articles', JSON.stringify(tweets));
             render();
             toggleForm();
-            // 清空表单
             document.querySelectorAll('#tweetForm input, #tweetForm textarea').forEach(el => el.value = '');
         }
 
-        // 删除推文逻辑
         function deleteTweet(id) {
-            if(confirm('确定要删除这条收藏吗？')) {
+            if(confirm('确定删除吗？')) {
                 tweets = tweets.filter(t => t.id !== id);
-                localStorage.setItem('saved_tweets', JSON.stringify(tweets));
+                localStorage.setItem('wx_articles', JSON.stringify(tweets));
                 render();
             }
         }
 
-        // 渲染页面函数
         function render() {
             const container = document.getElementById('cardContainer');
-            if (tweets.length === 0) {
-                container.innerHTML = '<p class="col-span-full text-center text-gray-400 py-20">还没有作品，点击上方按钮开始添加吧！</p>';
-                return;
-            }
-
             container.innerHTML = tweets.map(t => `
-                <div class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col">
-                    <div class="p-6 flex-grow">
-                        <span class="inline-block px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-full mb-3">${t.tag}</span>
-                        <h2 class="text-xl font-bold text-gray-800 mb-2 leading-tight">${t.title}</h2>
-                        <p class="text-gray-600 text-sm line-clamp-3">${t.desc || '暂无描述'}</p>
+                <div class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all border overflow-hidden flex flex-col group">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="${t.img}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.src='https://via.placeholder.com/400x200?text=Image+Load+Failed'">
                     </div>
-                    <div class="px-6 py-4 bg-gray-50 border-t border-gray-50 flex justify-between items-center">
-                        <a href="${t.url}" target="_blank" class="text-blue-600 hover:text-blue-800 font-semibold text-sm inline-flex items-center">
-                            阅读原文
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                        </a>
-                        <button onclick="deleteTweet(${t.id})" class="text-gray-300 hover:text-red-500 transition">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        </button>
+                    <div class="p-6 flex-grow">
+                        <h2 class="text-xl font-bold text-gray-800 mb-2 line-clamp-2">${t.title}</h2>
+                        <p class="text-gray-500 text-sm line-clamp-2">${t.desc || '点击下方按钮阅读全文'}</p>
+                    </div>
+                    <div class="px-6 py-4 bg-gray-50 flex justify-between items-center">
+                        <a href="${t.url}" target="_blank" class="text-green-600 font-bold hover:underline">阅读全文 →</a>
+                        <button onclick="deleteTweet(${t.id})" class="text-gray-300 hover:text-red-500">删除</button>
                     </div>
                 </div>
             `).join('');
         }
-
-        // 初始运行
         render();
     </script>
 </body>
