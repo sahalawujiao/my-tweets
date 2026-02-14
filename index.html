@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的推文收藏夹</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+
+    <header class="py-10 text-center bg-white shadow-sm">
+        <h1 class="text-3xl font-bold">推文收藏夹</h1>
+        <button onclick="toggleForm()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+            + 添加新推文
+        </button>
+    </header>
+
+    <div id="tweetForm" class="hidden max-w-xl mx-auto mt-6 p-6 bg-white rounded-xl shadow-md border">
+        <div class="grid gap-4">
+            <input type="text" id="tweetTitle" placeholder="推文标题" class="border p-2 rounded">
+            <input type="text" id="tweetTag" placeholder="分类标签 (如: 技术, 生活)" class="border p-2 rounded">
+            <textarea id="tweetDesc" placeholder="简短描述..." class="border p-2 rounded"></textarea>
+            <input type="url" id="tweetUrl" placeholder="推文链接 (https://...)" class="border p-2 rounded">
+            <button onclick="saveTweet()" class="bg-green-600 text-white py-2 rounded font-bold">保存到收藏夹</button>
+        </div>
+    </div>
+
+    <main class="max-w-4xl mx-auto p-6">
+        <div id="cardContainer" class="grid gap-6 md:grid-cols-2">
+            </div>
+    </main>
+
+    <script>
+        // 1. 页面加载时，尝试从本地读取已保存的数据
+        let tweets = JSON.parse(localStorage.getItem('myTweets')) || [];
+
+        // 2. 显示/隐藏表单
+        function toggleForm() {
+            const form = document.getElementById('tweetForm');
+            form.classList.toggle('hidden');
+        }
+
+        // 3. 保存推文并更新页面
+        function saveTweet() {
+            const newTweet = {
+                title: document.getElementById('tweetTitle').value,
+                tag: document.getElementById('tweetTag').value,
+                desc: document.getElementById('tweetDesc').value,
+                url: document.getElementById('tweetUrl').value,
+                id: Date.now()
+            };
+
+            if(!newTweet.title || !newTweet.url) return alert("标题和链接必填哦！");
+
+            tweets.push(newTweet);
+            localStorage.setItem('myTweets', JSON.stringify(tweets)); // 保存到浏览器缓存
+            renderTweets(); // 重新渲染列表
+            toggleForm();   // 关闭表单
+            
+            // 清空输入框
+            document.querySelectorAll('#tweetForm input, #tweetForm textarea').forEach(i => i.value = '');
+        }
+
+        // 4. 将数据转化为 HTML 卡片
+        function renderTweets() {
+            const container = document.getElementById('cardContainer');
+            container.innerHTML = tweets.map(t => `
+                <div class="bg-white p-6 rounded-xl shadow hover:shadow-lg transition-shadow border border-gray-100 relative">
+                    <span class="text-xs font-semibold text-blue-500 uppercase">${t.tag}</span>
+                    <h2 class="text-xl font-bold mt-2 mb-3">${t.title}</h2>
+                    <p class="text-gray-600 text-sm mb-4">${t.desc}</p>
+                    <a href="${t.url}" target="_blank" class="text-blue-600 hover:underline font-medium">查看原文 →</a>
+                    <button onclick="deleteTweet(${t.id})" class="absolute top-4 right-4 text-red-300 hover:text-red-500">删除</button>
+                </div>
+            `).join('');
+        }
+
+        // 5. 删除推文
+        function deleteTweet(id) {
+            tweets = tweets.filter(t => t.id !== id);
+            localStorage.setItem('myTweets', JSON.stringify(tweets));
+            renderTweets();
+        }
+
+        // 初始渲染
+        renderTweets();
+    </script>
+</body>
+</html>
